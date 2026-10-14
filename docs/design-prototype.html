@@ -1,0 +1,1404 @@
+<title>MUSME Platform Prototype</title>
+<meta name="description" content="Interactive design prototype for MUSME: teacher discovery, trial booking, and a live practice room with a taal player, tanpura drone, tuner and class chat.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a warm, light discover flow, with the live practice room as a dark stage. */
+:root {
+  --bg: #FFF8EE;
+  --surface: #FFFFFF;
+  --surface-2: #FBF1E2;
+  --ink: #2B1D14;
+  --muted: #6B5444;
+  --line: #EADCC8;
+  --primary: #C2410C;
+  --primary-ink: #FFFFFF;
+  --accent: #E9A93B;
+  --ok: #15803D;
+  --danger: #B91C1C;
+  --danger-ink: #FFFFFF;
+  --room-bg: #1B120D;
+  --room-surface: #2A1D16;
+  --room-ink: #FBEFE0;
+  --room-muted: #C7B098;
+  --room-accent: #F59E4B;
+  --room-ok: #86EFAC;
+  --radius: 18px;
+  --shadow: 0 14px 34px -16px rgba(43, 29, 20, .35);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+  --spring: cubic-bezier(.34, 1.56, .64, 1);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1A120D;
+    --surface: #241913;
+    --surface-2: #2E211A;
+    --ink: #FBEFE0;
+    --muted: #C7B098;
+    --line: #3A2A20;
+    --primary: #F97316;
+    --primary-ink: #1A120D;
+    --accent: #F5C06A;
+    --ok: #4ADE80;
+    --danger: #F87171;
+    --danger-ink: #1A120D;
+    --shadow: 0 14px 34px -16px rgba(0, 0, 0, .6);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1A120D;
+  --surface: #241913;
+  --surface-2: #2E211A;
+  --ink: #FBEFE0;
+  --muted: #C7B098;
+  --line: #3A2A20;
+  --primary: #F97316;
+  --primary-ink: #1A120D;
+  --accent: #F5C06A;
+  --ok: #4ADE80;
+  --danger: #F87171;
+  --danger-ink: #1A120D;
+  --shadow: 0 14px 34px -16px rgba(0, 0, 0, .6);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+button, input, select { font: inherit; color: inherit; }
+h1, h2, h3 { line-height: 1.2; text-wrap: balance; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; border-radius: 8px; }
+[hidden] { display: none !important; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 16px; top: -64px; z-index: 30; padding: 10px 14px; border-radius: 10px; background: var(--primary); color: var(--primary-ink); text-decoration: none; }
+.skip:focus { top: 12px; }
+
+/* Top bar */
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px clamp(16px, 4vw, 48px);
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .14em; text-decoration: none; }
+.logo {
+  width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center;
+  background: linear-gradient(135deg, var(--primary), var(--accent)); color: #fff; font-size: 18px;
+}
+.topnav { display: flex; flex-wrap: wrap; gap: 4px; }
+.topnav a {
+  padding: 8px 14px; border-radius: 999px; color: var(--muted); font-weight: 500; text-decoration: none;
+  transition: background-color .2s, color .2s;
+}
+.topnav a:hover { color: var(--ink); background: var(--surface-2); }
+.topnav a[aria-current="page"] { background: var(--ink); color: var(--bg); }
+
+/* Views */
+.view { display: none; }
+.view.is-active { display: block; animation: view-in .5s var(--ease) backwards; }
+@keyframes view-in { from { opacity: 0; transform: translateY(10px); } }
+.wrap { width: min(1160px, 100% - 32px); margin-inline: auto; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 10px 18px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  font-weight: 600; text-decoration: none; cursor: pointer;
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), background-color .2s;
+}
+.btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: var(--shadow); }
+.btn:active:not(:disabled) { transform: scale(.98); }
+.btn.primary { background: var(--primary); border-color: transparent; color: var(--primary-ink); }
+.btn.ghost { background: transparent; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+
+/* Discover */
+.hero { position: relative; overflow: hidden; isolation: isolate; }
+.hero > canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+.hero-inner { width: min(1160px, 100% - 32px); margin-inline: auto; padding: clamp(48px, 8vw, 96px) 0 clamp(28px, 4vw, 48px); }
+.eyebrow {
+  display: inline-block; padding: 6px 12px; border-radius: 999px;
+  background: var(--surface-2); color: var(--primary);
+  font-size: .8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+}
+.hero-title { margin: 18px 0 14px; font-size: clamp(2.3rem, 6vw, 4.5rem); letter-spacing: -.02em; font-weight: 700; max-width: 18ch; }
+.hero-title .line { display: block; animation: rise .8s var(--ease) backwards; animation-delay: calc(var(--d) * 120ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(24px); } }
+.lede { max-width: 56ch; margin: 0 0 26px; color: var(--muted); font-size: clamp(1.02rem, 1.6vw, 1.2rem); }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; }
+
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 28px 0 22px; }
+.chip {
+  min-height: 40px; padding: 8px 14px; border-radius: 999px;
+  border: 1px solid var(--line); background: var(--surface); cursor: pointer;
+  font-weight: 500; transition: background-color .2s, color .2s, border-color .2s;
+}
+.chip[aria-pressed="true"] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; padding-bottom: 40px; }
+.card {
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 20px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface);
+  transition: transform .35s var(--ease), box-shadow .35s var(--ease);
+  animation: card-in .6s var(--ease) backwards; animation-delay: calc(var(--i, 0) * 70ms);
+}
+.card:hover { transform: translateY(-5px); box-shadow: var(--shadow); }
+@keyframes card-in { from { opacity: 0; transform: translateY(16px); } }
+.card-top { display: flex; align-items: center; gap: 14px; }
+.card h3 { margin: 0 0 2px; font-size: 1.05rem; }
+.card p { margin: 0; color: var(--muted); font-size: .92rem; }
+.card-foot {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: auto; padding-top: 14px; border-top: 1px dashed var(--line);
+}
+.price { font-weight: 700; }
+.price small { color: var(--muted); font-weight: 500; }
+.next { display: inline-flex; align-items: center; gap: 6px; color: var(--ok); font-size: .85rem; font-weight: 500; }
+.next::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: ping 1.8s var(--ease) infinite; }
+@keyframes ping {
+  0% { box-shadow: 0 0 0 0 currentColor; }
+  70%, 100% { box-shadow: 0 0 0 8px transparent; }
+}
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { padding: 4px 10px; border-radius: 999px; background: var(--surface-2); color: var(--muted); font-size: .78rem; }
+.empty { color: var(--muted); }
+.note { margin: 0; color: var(--muted); font-size: .86rem; }
+.fine { padding-bottom: 56px; }
+
+.avatar {
+  flex: none; width: 60px; height: 60px; border-radius: 20px;
+  display: grid; place-items: center;
+  background: linear-gradient(135deg, hsl(var(--h) 78% 52%), hsl(calc(var(--h) + 36) 70% 36%));
+  color: #fff; font-size: 1.2rem; font-weight: 700;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .22);
+}
+
+/* Teacher profile and booking */
+.profile { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 22px; align-items: start; padding: 36px 0 72px; }
+.stack { display: grid; gap: 18px; min-width: 0; }
+.profile-head { display: flex; flex-wrap: wrap; align-items: center; gap: 20px; }
+.profile-head .avatar { width: 96px; height: 96px; border-radius: 28px; font-size: 2rem; }
+.profile-head h1 { margin: 0 0 6px; font-size: clamp(1.7rem, 4vw, 2.4rem); letter-spacing: -.01em; }
+.panel { padding: 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.panel h2 { margin: 0 0 14px; font-size: 1.05rem; }
+.muted { margin: 0; color: var(--muted); }
+.courses { display: grid; gap: 12px; }
+.course {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2);
+}
+.course strong { display: block; }
+.course small { color: var(--muted); }
+.summary { position: sticky; top: 84px; display: grid; gap: 14px; }
+.day { margin: 16px 0 8px; color: var(--muted); font-size: .88rem; font-weight: 600; }
+.day:first-of-type { margin-top: 0; }
+.slots { display: flex; flex-wrap: wrap; gap: 8px; }
+.slot {
+  min-width: 96px; min-height: 44px; padding: 8px 12px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--surface); cursor: pointer; font-weight: 500;
+  transition: transform .2s var(--spring), background-color .2s, color .2s, border-color .2s;
+}
+.slot:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--primary); }
+.slot:disabled { opacity: .4; text-decoration: line-through; cursor: not-allowed; }
+.slot[aria-pressed="true"] { background: var(--primary); border-color: transparent; color: var(--primary-ink); }
+.field { display: grid; gap: 6px; color: var(--muted); font-size: .9rem; }
+.field select {
+  min-height: 44px; padding: 8px 12px; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+}
+.summary dl { display: grid; grid-template-columns: 1fr auto; gap: 8px 12px; margin: 0; }
+.summary dt { color: var(--muted); }
+.summary dd { margin: 0; font-weight: 600; text-align: right; }
+.success { display: grid; justify-items: center; gap: 10px; padding: 8px 0; text-align: center; }
+.success svg { width: 72px; height: 72px; }
+.success circle { fill: none; stroke: var(--ok); stroke-width: 3; stroke-dasharray: 188; stroke-dashoffset: 188; animation: draw .7s var(--ease) forwards; }
+.success path { fill: none; stroke: var(--ok); stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 40; stroke-dashoffset: 40; animation: draw .45s var(--ease) .55s forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+
+/* Practice room (always dark, so the stage reads as a studio) */
+.room { min-height: calc(100vh - 66px); padding: 20px 0 56px; background: var(--room-bg); color: var(--room-ink); }
+.room-layout {
+  display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 18px; align-items: start;
+  width: min(1280px, 100% - 32px); margin-inline: auto;
+}
+.stage { display: grid; grid-template-columns: minmax(0, 1fr); gap: 14px; min-width: 0; }
+.room-head { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.room-head h2 { margin: 0; font-size: 1.1rem; }
+.live {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px;
+  background: var(--danger); color: var(--danger-ink);
+  font-size: .76rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+}
+.live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; animation: ping 1.6s infinite; }
+.tiles { display: grid; grid-template-columns: 1.5fr 1fr; gap: 14px; }
+.tile {
+  position: relative; display: grid; place-items: center; min-height: 300px; margin: 0;
+  overflow: hidden; border: 1px solid rgba(255, 255, 255, .07); border-radius: 24px;
+  background: radial-gradient(120% 90% at 30% 10%, color-mix(in srgb, var(--room-accent) 22%, var(--room-surface)), var(--room-surface));
+}
+.tile figcaption {
+  position: absolute; left: 12px; bottom: 12px; padding: 6px 12px; border-radius: 999px;
+  background: rgba(0, 0, 0, .45); font-size: .85rem; backdrop-filter: blur(6px);
+}
+.tile .avatar { width: 132px; height: 132px; border-radius: 50%; font-size: 2.6rem; animation: breathe 3.2s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: scale(1.035); } }
+.tile-note { color: var(--room-muted); font-size: .9rem; text-align: center; padding: 0 16px; }
+.meter { display: flex; align-items: flex-end; gap: 5px; height: 110px; }
+.meter span {
+  width: 8px; height: 100%; border-radius: 4px; transform-origin: bottom; transform: scaleY(.08);
+  background: linear-gradient(to top, var(--room-accent), #FDE68A);
+  transition: transform .08s linear;
+}
+.controls {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 10px;
+  padding: 10px; border-radius: 999px; background: var(--room-surface);
+}
+.ctl {
+  min-height: 44px; padding: 10px 18px; border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, .1); background: rgba(255, 255, 255, .06);
+  color: var(--room-ink); font-weight: 600; cursor: pointer;
+  transition: transform .25s var(--spring), background-color .2s, color .2s;
+}
+.ctl:hover { transform: translateY(-2px); }
+.ctl[aria-pressed="true"] { background: var(--room-accent); border-color: transparent; color: var(--room-bg); }
+.ctl.leave { background: var(--danger); border-color: transparent; color: var(--danger-ink); }
+.hint { margin: 0; color: var(--room-muted); font-size: .85rem; text-align: center; }
+kbd {
+  padding: 2px 7px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, .2);
+  background: rgba(255, 255, 255, .06); font: 600 .8rem Inter, system-ui, sans-serif;
+}
+
+.toolkit { display: grid; gap: 14px; min-width: 0; }
+.tk { padding: 18px; border: 1px solid rgba(255, 255, 255, .07); border-radius: 22px; background: var(--room-surface); }
+.tk h3 { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 14px; font-size: 1rem; }
+.pill { padding: 4px 10px; border-radius: 999px; background: rgba(255, 255, 255, .08); color: var(--room-muted); font-size: .78rem; font-weight: 500; white-space: nowrap; }
+.tk label { display: block; margin: 12px 0 6px; color: var(--room-muted); font-size: .85rem; }
+.tk select, .tk input[type="number"], .chat-form input {
+  min-height: 44px; padding: 8px 12px; border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, .14); background: var(--room-bg); color: var(--room-ink);
+}
+.tk select { width: 100%; }
+.tk input[type="number"] { width: 92px; min-height: 40px; }
+.tk input[type="range"] { width: 100%; accent-color: var(--room-accent); }
+.tk output { color: var(--room-ink); }
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 12px; }
+.row label { flex: 1 1 140px; margin: 0; }
+.check { display: grid !important; grid-template-columns: auto 1fr; align-items: start; gap: 10px; margin: 14px 0 0 !important; color: var(--room-ink) !important; font-size: .9rem !important; }
+.check input { margin-top: 4px; accent-color: var(--room-accent); }
+.bpm-row { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-top: 12px; }
+.bpm { font-size: 2.4rem; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.laya { color: var(--room-muted); font-size: .9rem; }
+.play {
+  min-height: 48px; padding: 0 22px; border: 0; border-radius: 999px;
+  background: var(--room-accent); color: var(--room-bg); font-weight: 700; cursor: pointer;
+  transition: transform .25s var(--spring);
+}
+.play:hover { transform: translateY(-2px); }
+
+.matras { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 0; margin: 16px 0 6px; }
+.vibhag { display: flex; align-items: center; gap: 10px; margin-right: 6px; padding: 8px 12px; border-left: 1px solid rgba(255, 255, 255, .14); }
+.vibhag:first-child { padding-left: 0; border-left: 0; }
+.matra {
+  display: block; width: 14px; height: 14px; border-radius: 50%;
+  background: rgba(255, 255, 255, .22);
+  transition: transform .14s var(--spring), background-color .14s, box-shadow .14s;
+}
+.matra.tali { width: 22px; height: 22px; border: 2px solid rgba(255, 255, 255, .6); background: transparent; }
+.matra.khali { width: 22px; height: 22px; border: 2px dashed rgba(255, 255, 255, .45); background: transparent; }
+.matra.sam { width: 28px; height: 28px; border: 3px solid var(--room-accent); background: transparent; }
+.matra.on {
+  background: var(--room-accent); border-color: var(--room-accent); transform: scale(1.3);
+  box-shadow: 0 0 22px color-mix(in srgb, var(--room-accent) 70%, transparent);
+}
+.legend { margin: 0 0 4px; color: var(--room-muted); font-size: .8rem; }
+
+.dial { position: relative; width: 220px; height: 120px; margin: 6px auto 0; }
+.dial svg { width: 100%; height: 100%; overflow: visible; }
+.needle {
+  position: absolute; left: 50%; bottom: 4px; width: 3px; height: 96px; margin-left: -1.5px;
+  border-radius: 3px; background: var(--room-accent); transform-origin: 50% 100%; transform: rotate(0deg);
+  transition: transform .35s var(--spring);
+}
+.needle::after {
+  content: ""; position: absolute; bottom: -6px; left: 50%; width: 12px; height: 12px; margin-left: -6px;
+  border-radius: 50%; background: var(--room-accent);
+}
+.readout { margin-top: 4px; min-height: 1.2em; text-align: center; font-size: 2.4rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.readout.ok { color: var(--room-ok); }
+.readout-sub { min-height: 1.4em; margin: 2px 0 12px; color: var(--room-muted); font-size: .9rem; text-align: center; }
+
+.chat .messages {
+  display: grid; gap: 10px; max-height: 210px; margin: 0 0 12px; padding: 0; overflow-y: auto; list-style: none;
+}
+.msg { padding: 10px 12px; border-radius: 14px; background: rgba(255, 255, 255, .06); font-size: .92rem; overflow-wrap: anywhere; }
+.msg strong { display: block; margin-bottom: 2px; color: var(--room-muted); font-size: .78rem; font-weight: 600; }
+.chat-form { display: flex; gap: 8px; }
+.chat-form input { flex: 1; min-width: 0; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 20px; z-index: 50;
+  max-width: min(92vw, 420px); padding: 12px 18px; border-radius: 14px;
+  background: var(--ink); color: var(--bg); box-shadow: var(--shadow);
+  transform: translate(-50%, 150%); transition: transform .5s var(--spring); pointer-events: none;
+}
+.toast.show { transform: translate(-50%, 0); }
+
+/* Responsive */
+@media (max-width: 960px) {
+  .room-layout, .profile { grid-template-columns: minmax(0, 1fr); }
+  .summary { position: static; }
+}
+@media (max-width: 640px) {
+  .topbar { padding-block: 10px; }
+  .tiles { grid-template-columns: minmax(0, 1fr); }
+  .tile { min-height: 230px; }
+  .tile .avatar { width: 104px; height: 104px; font-size: 2rem; }
+  .meter { height: 80px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <a class="brand" href="#discover"><span class="logo" aria-hidden="true">♪</span>MUSME</a>
+  <nav class="topnav" aria-label="Prototype screens">
+    <a href="#discover" data-nav="discover">Discover</a>
+    <a href="#teacher" data-nav="teacher">Teacher profile</a>
+    <a href="#room" data-nav="room">Practice room</a>
+  </nav>
+</header>
+
+<main id="main">
+
+  <!-- Discover -->
+  <section id="discover" class="view" aria-labelledby="hero-title">
+    <div class="hero">
+      <canvas id="wave" aria-hidden="true"></canvas>
+      <div class="hero-inner">
+        <span class="eyebrow">Live 1:1 lessons · Practice with taal</span>
+        <h1 id="hero-title" class="hero-title">
+          <span class="line" style="--d: 0">Learn music live.</span>
+          <span class="line" style="--d: 1">Practice with the taal.</span>
+        </h1>
+        <p class="lede">Book a teacher, join a live class, and practice with a built-in taal, tanpura drone and tuner, all in one room.</p>
+        <div class="cta-row">
+          <a class="btn primary" href="#teacher">Book a trial lesson</a>
+          <a class="btn" href="#room">Open the practice room</a>
+        </div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="filters" id="filters" role="group" aria-label="Filter teachers by instrument"></div>
+      <div class="grid" id="grid"></div>
+      <p class="note fine">Teachers, prices and times are sample data for design review.</p>
+    </div>
+  </section>
+
+  <!-- Teacher profile and booking -->
+  <section id="teacher" class="view" aria-labelledby="p-name">
+    <div class="wrap profile">
+      <div class="stack">
+        <header class="profile-head">
+          <div class="avatar" id="p-avatar" aria-hidden="true"></div>
+          <div>
+            <h1 id="p-name"></h1>
+            <p class="note" id="p-meta"></p>
+          </div>
+        </header>
+        <section class="panel" aria-labelledby="about-h">
+          <h2 id="about-h">About</h2>
+          <p class="muted" id="p-bio"></p>
+        </section>
+        <section class="panel" aria-labelledby="courses-h">
+          <h2 id="courses-h">Courses and best lessons</h2>
+          <div class="courses" id="courses"></div>
+        </section>
+      </div>
+
+      <aside class="panel summary" aria-labelledby="book-h">
+        <h2 id="book-h">Book a live class</h2>
+        <div id="booking-form">
+          <label class="field" for="duration">
+            Length
+            <select id="duration">
+              <option value="30">30 min</option>
+              <option value="45" selected>45 min</option>
+              <option value="60">60 min</option>
+            </select>
+          </label>
+          <p class="day">Choose a time</p>
+          <div id="slots"></div>
+          <dl>
+            <dt>Teacher</dt><dd id="s-teacher"></dd>
+            <dt>Time</dt><dd id="s-slot">Not chosen</dd>
+            <dt>Length</dt><dd id="s-duration"></dd>
+            <dt>Lesson price</dt><dd id="s-price"></dd>
+          </dl>
+          <p class="note">Fees and taxes are calculated at checkout. Business rules to be confirmed.</p>
+          <button type="button" class="btn primary" id="btn-book" disabled>Request trial lesson</button>
+        </div>
+        <div id="booking-success" class="success" hidden role="status">
+          <svg viewBox="0 0 72 72" aria-hidden="true"><circle cx="36" cy="36" r="30"/><path d="M23 37 L32 46 L49 28"/></svg>
+          <h3>Trial requested</h3>
+          <p class="note">Time: <span id="success-slot"></span>. A confirmation follows once payment clears (demo).</p>
+          <a class="btn primary" href="#room">Preview the practice room</a>
+          <button type="button" class="btn ghost" id="btn-again">Book another time</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Live class and practice room -->
+  <section id="room" class="view room" aria-labelledby="room-title">
+    <div class="room-layout">
+      <div class="stage">
+        <div class="room-head">
+          <span class="live">Live</span>
+          <h2 id="room-title">Class with Asha Verma · 45 min</h2>
+        </div>
+
+        <div class="tiles">
+          <figure class="tile">
+            <div class="avatar" style="--h: 18" aria-hidden="true">AV</div>
+            <figcaption>Asha Verma · Teacher</figcaption>
+          </figure>
+          <figure class="tile">
+            <div class="meter" id="meter" aria-hidden="true"></div>
+            <p class="tile-note" id="you-note">Mic is off</p>
+            <figcaption>You</figcaption>
+          </figure>
+        </div>
+
+        <div class="controls" role="toolbar" aria-label="Call controls">
+          <button type="button" class="ctl" id="btn-mic" aria-pressed="false">Mic off</button>
+          <button type="button" class="ctl" id="btn-cam" aria-pressed="true">Camera on</button>
+          <button type="button" class="ctl" id="btn-share" aria-pressed="false">Share backing with teacher</button>
+          <button type="button" class="ctl leave" id="btn-leave">Leave class</button>
+        </div>
+        <p class="hint">Keys: <kbd>Space</kbd> play or stop the taal · <kbd>←</kbd> <kbd>→</kbd> tempo ±1 · <kbd>↑</kbd> <kbd>↓</kbd> tempo ±5</p>
+
+        <section class="tk chat" aria-labelledby="chat-h">
+          <h3 id="chat-h">Class chat <span class="pill">Saved to the lesson</span></h3>
+          <ul class="messages" id="messages" role="log" aria-live="polite" aria-label="Class chat messages">
+            <li class="msg"><strong>Asha Verma</strong>Start with Teentaal at 84 BPM. Tell me when the sam feels settled.</li>
+            <li class="msg"><strong>You</strong>Ready. Turning the drone on.</li>
+          </ul>
+          <form class="chat-form" id="chat-form" autocomplete="off">
+            <label class="sr-only" for="chat-input">Message</label>
+            <input id="chat-input" type="text" maxlength="2000" placeholder="Message Asha">
+            <button type="submit" class="ctl">Send</button>
+          </form>
+        </section>
+      </div>
+
+      <aside class="toolkit" aria-label="Practice toolkit">
+        <section class="tk" aria-labelledby="tk-taal">
+          <h3 id="tk-taal">Tabla taal <span class="pill" id="cycle-label">Ready</span></h3>
+          <label for="taal">Taal</label>
+          <select id="taal"></select>
+          <div class="matras" id="matras" aria-hidden="true"></div>
+          <p class="legend">Sam is beat 1. Ring is clap (tali). Dashed ring is wave (khali).</p>
+          <div class="bpm-row">
+            <span class="bpm" id="bpm-display"><span id="bpm-value">84</span><small> BPM</small></span>
+            <span class="laya" id="laya">Medium</span>
+          </div>
+          <label for="bpm">Tempo</label>
+          <input id="bpm" type="range" min="40" max="240" value="84" step="1">
+          <label class="check"><input type="checkbox" id="trainer"> Speed trainer: +4 BPM every 4 cycles, up to</label>
+          <div class="row">
+            <input type="number" id="target" min="40" max="240" value="120" aria-label="Target tempo in BPM">
+          </div>
+          <div class="row">
+            <button type="button" class="play" id="btn-play">Play taal</button>
+            <label>Volume <input type="range" id="taal-vol" min="0" max="1" step="0.01" value="0.8"></label>
+          </div>
+        </section>
+
+        <section class="tk" aria-labelledby="tk-drone">
+          <h3 id="tk-drone">Tanpura drone</h3>
+          <label for="sa">Sa (tonic)</label>
+          <select id="sa">
+            <option value="0">C</option><option value="1">C♯ / D♭</option><option value="2">D</option>
+            <option value="3">D♯ / E♭</option><option value="4">E</option><option value="5">F</option>
+            <option value="6">F♯ / G♭</option><option value="7">G</option><option value="8">G♯ / A♭</option>
+            <option value="9">A</option><option value="10">A♯ / B♭</option><option value="11">B</option>
+          </select>
+          <div class="row">
+            <button type="button" class="ctl" id="btn-drone" aria-pressed="false">Start drone</button>
+            <label>Volume <input type="range" id="drone-vol" min="0" max="1" step="0.01" value="0.5"></label>
+          </div>
+        </section>
+
+        <section class="tk" aria-labelledby="tk-tuner">
+          <h3 id="tk-tuner">Tuner <span class="pill">A4 = <span id="a4-out">440 Hz</span></span></h3>
+          <label for="a4">Reference A4</label>
+          <input id="a4" type="range" min="415" max="466" value="440" step="1">
+          <div class="dial" aria-hidden="true">
+            <svg viewBox="0 0 220 120">
+              <path d="M23.4 66 A100 100 0 0 1 196.6 66" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="2"/>
+              <path d="M33.8 72 L23.4 66 M66 39.8 L60 29.4 M110 28 V16 M154 39.8 L160 29.4 M186.2 72 L196.6 66" stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <div class="needle" id="needle"></div>
+          </div>
+          <p class="readout" id="note">–</p>
+          <p class="readout-sub" id="tuner-sub">Turn on the tuner, then play or sing a note.</p>
+          <p class="sr-only" id="tuner-status" aria-live="polite"></p>
+          <div class="row">
+            <button type="button" class="ctl" id="btn-tuner" aria-pressed="false">Start tuner</button>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  const $ = (sel, root = document) => root.querySelector(sel);
+  const $$ = (sel, root = document) => Array.from(root.querySelectorAll(sel));
+  const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const SWARAS = ['Sa', 'Re♭', 'Re', 'Ga♭', 'Ga', 'Ma', 'Ma♯', 'Pa', 'Dha♭', 'Dha', 'Ni♭', 'Ni'];
+  const METER_SHAPE = [0.55, 0.7, 0.85, 1, 0.9, 0.75, 1, 0.8, 0.6, 0.9, 0.7, 0.5];
+  const VIEWS = ['discover', 'teacher', 'room'];
+
+  // Sample data: fictional people, prices and times for design review only.
+  const TEACHERS = [
+    { id: 'asha-verma', name: 'Asha Verma', initials: 'AV', hue: 18, instrument: 'Vocal', style: 'Hindustani vocal', languages: 'Hindi, English', rating: 4.9, reviews: 128, rate: 22, next: 'Today, 18:30', bio: 'Trains voice production and bandish interpretation for beginners and returning singers.' },
+    { id: 'imran-qadri', name: 'Imran Qadri', initials: 'IQ', hue: 28, instrument: 'Tabla', style: 'Taal and accompaniment', languages: 'Urdu, English', rating: 4.8, reviews: 96, rate: 20, next: 'Tomorrow, 09:00', bio: 'Teaches taal cycles, bol recitation and accompaniment for vocalists.' },
+    { id: 'farah-noor', name: 'Farah Noor', initials: 'FN', hue: 340, instrument: 'Tabla', style: 'Dadra and Keherwa', languages: 'Urdu, English', rating: 4.7, reviews: 54, rate: 18, next: 'Today, 20:00', bio: 'Focuses on light-classical taals and clean hand technique.' },
+    { id: 'leo-martins', name: 'Leo Martins', initials: 'LM', hue: 150, instrument: 'Guitar', style: 'Blues and fingerstyle', languages: 'English, Portuguese', rating: 4.8, reviews: 210, rate: 24, next: 'Tomorrow, 11:30', bio: 'Fingerstyle, rhythm and improvisation for adults with no prior experience.' },
+    { id: 'nadia-rahman', name: 'Nadia Rahman', initials: 'NR', hue: 270, instrument: 'Harmonium', style: 'Bhajan and devotional', languages: 'Bengali, English', rating: 4.9, reviews: 73, rate: 19, next: 'Today, 11:30', bio: 'Harmonium basics, sur and sargam drills, and devotional repertoire.' },
+    { id: 'sam-okafor', name: 'Sam Okafor', initials: 'SO', hue: 200, instrument: 'DJ', style: 'Beat-making and turntablism', languages: 'English', rating: 4.6, reviews: 41, rate: 26, next: 'Today, 18:30', bio: 'Beat programming, sampling and live mixing for electronic music.' },
+  ];
+
+  const COURSES = {
+    'asha-verma': [
+      { title: 'Teentaal foundations', meta: '8 lessons · Beginner', price: 45 },
+      { title: 'Raag Yaman for singers', meta: '6 lessons · Intermediate', price: 60 },
+      { title: 'Breath control in bandish', meta: 'Best lesson · 14 min preview', price: 0 },
+    ],
+    'imran-qadri': [
+      { title: 'Taal cycles explained', meta: '5 lessons · Beginner', price: 35 },
+      { title: 'Keherwa for accompaniment', meta: 'Best lesson · 9 min preview', price: 0 },
+    ],
+  };
+
+  // Bol patterns are illustrative. A tabla teacher must validate every taal before launch.
+  const TAALS = {
+    teentaal: { name: 'Teentaal (16)', beats: 16, vibhags: [4, 4, 4, 4], tali: [0, 4, 12], khali: [8],
+      bols: ['dha', 'dhin', 'dhin', 'dha', 'dha', 'dhin', 'dhin', 'dha', 'dha', 'na', 'na', 'na', 'na', 'dhin', 'dhin', 'dha'] },
+    keherwa: { name: 'Keherwa (8)', beats: 8, vibhags: [4, 4], tali: [0], khali: [4],
+      bols: ['dha', 'ge', 'na', 'na', 'na', 'ge', 'dhin', 'na'] },
+    dadra: { name: 'Dadra (6)', beats: 6, vibhags: [3, 3], tali: [0], khali: [3],
+      bols: ['dha', 'dhin', 'na', 'dhin', 'na', 'dha'] },
+    jhaptaal: { name: 'Jhaptaal (10)', beats: 10, vibhags: [2, 3, 2, 3], tali: [0, 2, 7], khali: [5],
+      bols: ['dhin', 'na', 'dhin', 'dhin', 'na', 'na', 'na', 'dhin', 'dhin', 'na'] },
+  };
+
+  const state = { teacherId: TEACHERS[0].id, filter: 'All', taal: 'teentaal', bpm: 84, target: 120, saIndex: 0, slot: null, duration: 45 };
+  let profileId = null;
+  let matraEls = [];
+
+  /* ---------- Discover ---------- */
+
+  function renderChips() {
+    const host = $('#filters');
+    ['All', ...new Set(TEACHERS.map(t => t.instrument))].forEach(label => {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = 'chip';
+      chip.textContent = label;
+      chip.setAttribute('aria-pressed', String(label === state.filter));
+      chip.addEventListener('click', () => setFilter(label));
+      host.append(chip);
+    });
+  }
+
+  function setFilter(label) {
+    state.filter = label;
+    $$('.chip').forEach(chip => chip.setAttribute('aria-pressed', String(chip.textContent === label)));
+    renderGrid();
+  }
+
+  function renderGrid() {
+    const grid = $('#grid');
+    const list = TEACHERS.filter(t => state.filter === 'All' || t.instrument === state.filter);
+    grid.replaceChildren();
+    if (!list.length) {
+      grid.innerHTML = '<p class="empty">No teachers for this instrument yet.</p>';
+      return;
+    }
+    list.forEach((t, i) => {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.style.setProperty('--i', i);
+      card.innerHTML = `
+        <div class="card-top">
+          <div class="avatar" style="--h: ${t.hue}" aria-hidden="true">${t.initials}</div>
+          <div><h3>${t.name}</h3><p>${t.instrument} · ${t.style}</p></div>
+        </div>
+        <div class="tags"><span class="tag">${t.languages}</span><span class="tag">★ ${t.rating} (${t.reviews})</span></div>
+        <span class="next">${t.next}</span>
+        <div class="card-foot">
+          <span class="price">$${t.rate}<small> /hr</small></span>
+          <button type="button" class="btn ghost" data-teacher="${t.id}">View profile</button>
+        </div>`;
+      grid.append(card);
+    });
+  }
+
+  /* ---------- Teacher profile and booking ---------- */
+
+  function currentTeacher() {
+    return TEACHERS.find(t => t.id === state.teacherId) || TEACHERS[0];
+  }
+
+  function renderProfile() {
+    const t = currentTeacher();
+    profileId = t.id;
+    const avatar = $('#p-avatar');
+    avatar.textContent = t.initials;
+    avatar.style.setProperty('--h', t.hue);
+    $('#p-name').textContent = t.name;
+    $('#p-meta').textContent = `${t.instrument} · ${t.style} · ${t.languages} · ★ ${t.rating} (${t.reviews} reviews)`;
+    $('#p-bio').textContent = t.bio;
+    $('#room-title').textContent = `Class with ${t.name} · 45 min`;
+    renderCourses(t.id);
+    renderSlots(t);
+    state.slot = null;
+    $('#booking-form').hidden = false;
+    $('#booking-success').hidden = true;
+    updateSummary(t);
+  }
+
+  function renderCourses(teacherId) {
+    const host = $('#courses');
+    host.replaceChildren();
+    const items = COURSES[teacherId] || [];
+    if (!items.length) {
+      host.innerHTML = '<p class="note">No published courses yet. Live lessons can still be booked.</p>';
+      return;
+    }
+    items.forEach(course => {
+      const row = document.createElement('div');
+      row.className = 'course';
+      const text = document.createElement('div');
+      const title = document.createElement('strong');
+      title.textContent = course.title;
+      const meta = document.createElement('small');
+      meta.textContent = course.meta;
+      text.append(title, meta);
+      const price = document.createElement('span');
+      price.className = 'price';
+      price.textContent = course.price ? `$${course.price}` : 'Preview';
+      row.append(text, price);
+      host.append(row);
+    });
+  }
+
+  function renderSlots(t) {
+    const host = $('#slots');
+    host.replaceChildren();
+    const times = ['09:00', '11:30', '18:30', '20:00'];
+    const today = new Date();
+    for (let d = 0; d < 3; d++) {
+      const day = new Date(today);
+      day.setDate(today.getDate() + d);
+      const heading = day.toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'short' });
+      const label = document.createElement('p');
+      label.className = 'day';
+      label.textContent = heading;
+      const group = document.createElement('div');
+      group.className = 'slots';
+      group.setAttribute('role', 'group');
+      group.setAttribute('aria-label', heading);
+      times.forEach((time, s) => {
+        const available = ((d * 7 + s * 3 + t.hue) % 4) !== 0;
+        const slot = document.createElement('button');
+        slot.type = 'button';
+        slot.className = 'slot';
+        slot.textContent = time;
+        slot.disabled = !available;
+        slot.setAttribute('aria-pressed', 'false');
+        slot.setAttribute('aria-label', `${heading} at ${time}${available ? '' : ', unavailable'}`);
+        slot.dataset.label = `${heading}, ${time}`;
+        group.append(slot);
+      });
+      host.append(label, group);
+    }
+  }
+
+  function updateSummary(t) {
+    const minutes = state.duration;
+    const price = Math.round(t.rate * minutes / 60 * 100) / 100;
+    $('#s-teacher').textContent = t.name;
+    $('#s-slot').textContent = state.slot || 'Not chosen';
+    $('#s-duration').textContent = `${minutes} min`;
+    $('#s-price').textContent = `$${price.toFixed(2)}`;
+    $('#btn-book').disabled = !state.slot;
+  }
+
+  $('#slots').addEventListener('click', e => {
+    const slot = e.target.closest('.slot');
+    if (!slot || slot.disabled) return;
+    $$('.slot').forEach(s => s.setAttribute('aria-pressed', String(s === slot)));
+    state.slot = slot.dataset.label;
+    updateSummary(currentTeacher());
+  });
+
+  $('#duration').addEventListener('change', e => {
+    state.duration = Number(e.target.value);
+    updateSummary(currentTeacher());
+  });
+
+  $('#btn-book').addEventListener('click', () => {
+    if (!state.slot) return;
+    $('#success-slot').textContent = state.slot;
+    $('#booking-form').hidden = true;
+    $('#booking-success').hidden = false;
+    toast('Trial lesson requested (demo).');
+  });
+
+  $('#btn-again').addEventListener('click', () => renderProfile());
+
+  $('#grid').addEventListener('click', e => {
+    const btn = e.target.closest('[data-teacher]');
+    if (!btn) return;
+    state.teacherId = btn.dataset.teacher;
+    location.hash = '#teacher';
+  });
+
+  /* ---------- Practice room: taal, drone and tuner ---------- */
+
+  let ctx = null;
+  let taalBus = null;
+  let droneBus = null;
+  let noiseBuf = null;
+  const taalNodes = new Set();
+
+  // Created on the first user gesture, so browsers allow sound to start.
+  function audio() {
+    if (!ctx) {
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const master = ctx.createGain();
+      master.gain.value = 0.9;
+      master.connect(ctx.destination);
+      taalBus = ctx.createGain();
+      taalBus.gain.value = Number($('#taal-vol').value);
+      taalBus.connect(master);
+      droneBus = ctx.createGain();
+      droneBus.gain.value = Number($('#drone-vol').value);
+      droneBus.connect(master);
+      noiseBuf = noiseBuffer(ctx, 0.05);
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+
+  function noiseBuffer(c, seconds) {
+    const buf = c.createBuffer(1, Math.floor(c.sampleRate * seconds), c.sampleRate);
+    const data = buf.getChannelData(0);
+    for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    return buf;
+  }
+
+  function trackTaal(node) {
+    taalNodes.add(node);
+    node.onended = () => taalNodes.delete(node);
+  }
+
+  function tone(dest, when, { freq, freqEnd = 0, dur, vol, type = 'sine' }) {
+    const osc = ctx.createOscillator();
+    const env = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, when);
+    if (freqEnd) osc.frequency.exponentialRampToValueAtTime(freqEnd, when + dur * 0.6);
+    env.gain.setValueAtTime(0.0001, when);
+    env.gain.exponentialRampToValueAtTime(vol, when + 0.004);
+    env.gain.exponentialRampToValueAtTime(0.0001, when + dur);
+    osc.connect(env);
+    env.connect(dest);
+    trackTaal(osc);
+    osc.start(when);
+    osc.stop(when + dur + 0.05);
+  }
+
+  function click(dest, when, vol) {
+    const src = ctx.createBufferSource();
+    const highpass = ctx.createBiquadFilter();
+    const env = ctx.createGain();
+    src.buffer = noiseBuf;
+    highpass.type = 'highpass';
+    highpass.frequency.value = 1800;
+    env.gain.setValueAtTime(vol, when);
+    env.gain.exponentialRampToValueAtTime(0.0001, when + 0.02);
+    src.connect(highpass);
+    highpass.connect(env);
+    env.connect(dest);
+    trackTaal(src);
+    src.start(when, 0, 0.03);
+    src.stop(when + 0.03);
+  }
+
+  // Synthesised stand-ins for recorded bols. Production uses licensed or recorded samples.
+  const BOLS = {
+    dha: (d, t, v) => {
+      tone(d, t, { freq: 120, freqEnd: 55, dur: 0.45, vol: 0.9 * v });
+      tone(d, t, { freq: 330, dur: 0.22, vol: 0.3 * v, type: 'triangle' });
+      click(d, t, 0.2 * v);
+    },
+    dhin: (d, t, v) => {
+      tone(d, t, { freq: 420, freqEnd: 380, dur: 0.5, vol: 0.6 * v });
+      click(d, t, 0.14 * v);
+    },
+    ge: (d, t, v) => tone(d, t, { freq: 95, freqEnd: 70, dur: 0.25, vol: 0.55 * v }),
+    na: (d, t, v) => {
+      tone(d, t, { freq: 640, freqEnd: 600, dur: 0.14, vol: 0.45 * v });
+      click(d, t, 0.12 * v);
+    },
+  };
+
+  // Lookahead scheduler: audio is scheduled on the AudioContext clock, so timer jitter never reaches the sound.
+  const LOOKAHEAD_S = 0.12;
+  const TICK_MS = 25;
+  const transport = { on: false, timer: 0, raf: 0, next: 0, beat: 0, cycle: 0, queue: [] };
+
+  function scheduleBeats() {
+    const c = audio();
+    const taal = TAALS[state.taal];
+    while (transport.next < c.currentTime + LOOKAHEAD_S) {
+      const accent = transport.beat === 0 ? 1 : 0.8;
+      BOLS[taal.bols[transport.beat]](taalBus, transport.next, accent);
+      transport.queue.push({ time: transport.next, beat: transport.beat, cycle: transport.cycle });
+      transport.next += 60 / state.bpm;
+      transport.beat = (transport.beat + 1) % taal.beats;
+      if (transport.beat === 0) {
+        transport.cycle += 1;
+        applySpeedTrainer();
+      }
+    }
+  }
+
+  function applySpeedTrainer() {
+    if (!$('#trainer').checked) return;
+    if (transport.cycle % 4 !== 0) return;
+    if (state.bpm >= state.target) return;
+    setBpm(Math.min(state.target, state.bpm + 4));
+  }
+
+  // The UI reads scheduled beat times on animation frames. Nothing here runs per audio sample.
+  function paintLoop() {
+    if (!transport.on) return;
+    const now = ctx.currentTime;
+    while (transport.queue.length && transport.queue[0].time <= now) {
+      const { beat, cycle } = transport.queue.shift();
+      matraEls.forEach((el, i) => el.classList.toggle('on', i === beat));
+      $('#cycle-label').textContent = `Cycle ${cycle + 1}`;
+    }
+    transport.raf = requestAnimationFrame(paintLoop);
+  }
+
+  function startTaal() {
+    if (transport.on) return;
+    const c = audio();
+    transport.on = true;
+    transport.beat = 0;
+    transport.cycle = 0;
+    transport.queue = [];
+    transport.next = c.currentTime + 0.08;
+    scheduleBeats();
+    transport.timer = setInterval(scheduleBeats, TICK_MS);
+    transport.raf = requestAnimationFrame(paintLoop);
+    setPlayLabel(true);
+  }
+
+  function stopTaal() {
+    if (!transport.on) return;
+    transport.on = false;
+    clearInterval(transport.timer);
+    cancelAnimationFrame(transport.raf);
+    transport.queue = [];
+    taalNodes.forEach(node => { try { node.stop(); } catch (_) { /* already finished */ } });
+    taalNodes.clear();
+    matraEls.forEach(el => el.classList.remove('on'));
+    $('#cycle-label').textContent = 'Ready';
+    setPlayLabel(false);
+  }
+
+  function toggleTaal() {
+    if (transport.on) stopTaal();
+    else startTaal();
+  }
+
+  function setPlayLabel(on) {
+    $('#btn-play').textContent = on ? 'Stop taal' : 'Play taal';
+  }
+
+  function renderMatras() {
+    const taal = TAALS[state.taal];
+    const host = $('#matras');
+    host.replaceChildren();
+    let beat = 0;
+    taal.vibhags.forEach(size => {
+      const group = document.createElement('div');
+      group.className = 'vibhag';
+      for (let k = 0; k < size; k++, beat++) {
+        const dot = document.createElement('span');
+        if (beat === 0) dot.className = 'matra sam';
+        else if (taal.tali.includes(beat)) dot.className = 'matra tali';
+        else if (taal.khali.includes(beat)) dot.className = 'matra khali';
+        else dot.className = 'matra';
+        group.append(dot);
+      }
+      host.append(group);
+    });
+    matraEls = $$('.matra', host);
+  }
+
+  function buildTaalOptions() {
+    const select = $('#taal');
+    Object.entries(TAALS).forEach(([key, taal]) => select.append(new Option(taal.name, key)));
+    select.value = state.taal;
+  }
+
+  function setBpm(value) {
+    state.bpm = clamp(Math.round(value), 40, 240);
+    $('#bpm').value = state.bpm;
+    $('#bpm-value').textContent = state.bpm;
+    $('#laya').textContent = state.bpm < 70 ? 'Slow' : state.bpm <= 150 ? 'Medium' : 'Fast';
+  }
+
+  function setVolume(bus, value) {
+    if (bus) bus.gain.setTargetAtTime(Number(value), ctx.currentTime, 0.02);
+  }
+
+  $('#btn-play').addEventListener('click', toggleTaal);
+  $('#bpm').addEventListener('input', e => setBpm(Number(e.target.value)));
+  $('#target').addEventListener('change', e => { state.target = clamp(Number(e.target.value), 40, 240); });
+  $('#taal-vol').addEventListener('input', e => setVolume(taalBus, e.target.value));
+  $('#drone-vol').addEventListener('input', e => setVolume(droneBus, e.target.value));
+  $('#taal').addEventListener('change', e => {
+    const wasOn = transport.on;
+    stopTaal();
+    state.taal = e.target.value;
+    renderMatras();
+    if (wasOn) startTaal();
+  });
+
+  // Tanpura: four plucked strings (Pa, Sa, Sa upper, Sa lower) from a Karplus-Strong loop.
+  let drone = null;
+
+  function saFrequency(index) {
+    return 130.81 * 2 ** (index / 12);
+  }
+
+  function makeString(c, freq) {
+    const delay = c.createDelay(1);
+    // Compensate for the loop filter's group delay so the pitch lands on the tonic.
+    delay.delayTime.value = Math.max(0.0005, 1 / freq - 0.00012);
+    const loop = c.createBiquadFilter();
+    loop.type = 'lowpass';
+    loop.frequency.value = Math.min(6000, freq * 30);
+    const feedback = c.createGain();
+    feedback.gain.value = Math.pow(0.93, 1 / freq); // about 7% energy loss per second
+    const input = c.createGain();
+    const out = c.createGain();
+    out.gain.value = 0.22;
+    input.connect(delay);
+    delay.connect(loop);
+    loop.connect(feedback);
+    feedback.connect(delay);
+    loop.connect(out);
+    out.connect(droneBus);
+    return { input, out, nodes: [input, delay, loop, feedback, out] };
+  }
+
+  function pluck(c, string, offset) {
+    const src = c.createBufferSource();
+    const gain = c.createGain();
+    gain.gain.value = 0.8;
+    src.buffer = noiseBuf;
+    src.connect(gain);
+    gain.connect(string.input);
+    src.start(c.currentTime + offset);
+  }
+
+  function startDrone() {
+    if (drone) return;
+    const c = audio();
+    const sa = saFrequency(state.saIndex);
+    const strings = [0.75, 1, 2, 0.5].map(ratio => makeString(c, sa * ratio));
+    strings.forEach((s, i) => pluck(c, s, i * 0.8));
+    const timer = setInterval(() => strings.forEach((s, i) => pluck(c, s, i * 0.8)), 7000);
+    drone = { strings, timer };
+    setDroneUI(true);
+  }
+
+  function stopDrone() {
+    if (!drone) return;
+    clearInterval(drone.timer);
+    const now = ctx.currentTime;
+    drone.strings.forEach(s => s.out.gain.setTargetAtTime(0, now, 0.08));
+    const stale = drone;
+    drone = null;
+    setTimeout(() => stale.strings.forEach(s => s.nodes.forEach(n => n.disconnect())), 900);
+    setDroneUI(false);
+  }
+
+  function setDroneUI(on) {
+    const btn = $('#btn-drone');
+    btn.textContent = on ? 'Stop drone' : 'Start drone';
+    btn.setAttribute('aria-pressed', String(on));
+  }
+
+  $('#btn-drone').addEventListener('click', () => (drone ? stopDrone() : startDrone()));
+  $('#sa').addEventListener('change', e => {
+    state.saIndex = Number(e.target.value);
+    if (drone) {
+      stopDrone();
+      startDrone();
+    }
+  });
+
+  // Tuner and mic meter share one microphone stream. Processing is off because it degrades music.
+  const mic = { stream: null, source: null, analyser: null, buf: null, raf: 0, last: 0, tuning: false, busy: false };
+
+  async function enableMic() {
+    if (mic.analyser || mic.busy) return Boolean(mic.analyser);
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setTunerMessage('This browser cannot open a microphone.');
+      return false;
+    }
+    mic.busy = true;
+    try {
+      mic.stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
+      });
+    } catch (_) {
+      setTunerMessage('Microphone access is blocked. Allow it to use the tuner and the mic meter.');
+      return false;
+    } finally {
+      mic.busy = false;
+    }
+    const c = audio();
+    mic.source = c.createMediaStreamSource(mic.stream);
+    mic.analyser = c.createAnalyser();
+    mic.analyser.fftSize = 2048;
+    mic.buf = new Float32Array(mic.analyser.fftSize);
+    mic.source.connect(mic.analyser);
+    setMicUI(true);
+    mic.raf = requestAnimationFrame(micLoop);
+    return true;
+  }
+
+  function disableMic() {
+    cancelAnimationFrame(mic.raf);
+    mic.stream?.getTracks().forEach(track => track.stop());
+    mic.source?.disconnect();
+    mic.stream = null;
+    mic.source = null;
+    mic.analyser = null;
+    mic.tuning = false;
+    paintMeter(0);
+    setMicUI(false);
+    setTunerUI(false);
+  }
+
+  async function toggleMic() {
+    if (mic.analyser) disableMic();
+    else await enableMic();
+  }
+
+  function micLoop(now) {
+    if (!mic.analyser) return;
+    mic.raf = requestAnimationFrame(micLoop);
+    if (now - mic.last < 45) return; // about 22 updates per second is plenty for a meter and tuner
+    mic.last = now;
+    mic.analyser.getFloatTimeDomainData(mic.buf);
+    paintMeter(rms(mic.buf));
+    if (mic.tuning) paintTuner(detectPitch(mic.buf, ctx.sampleRate));
+  }
+
+  async function toggleTuner() {
+    if (mic.tuning) {
+      mic.tuning = false;
+      setTunerUI(false);
+      return;
+    }
+    if (!(await enableMic())) return;
+    mic.tuning = true;
+    setTunerUI(true);
+  }
+
+  function rms(buf) {
+    let sum = 0;
+    for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+    return Math.sqrt(sum / buf.length);
+  }
+
+  // Autocorrelation pitch detection. Production moves this to an AudioWorklet (YIN-style).
+  function detectPitch(buf, sampleRate) {
+    if (rms(buf) < 0.01) return null;
+    const minLag = Math.floor(sampleRate / 1000);
+    const maxLag = Math.floor(sampleRate / 60);
+    const span = buf.length - maxLag;
+    const corr = new Float32Array(maxLag + 2);
+    let maxCorr = 0;
+    for (let lag = minLag; lag <= maxLag; lag++) {
+      let sum = 0;
+      for (let i = 0; i < span; i++) sum += buf[i] * buf[i + lag];
+      corr[lag] = sum;
+      if (sum > maxCorr) maxCorr = sum;
+    }
+    if (maxCorr <= 0) return null;
+    // Take the first strong peak so the detector doesn't lock onto an octave below.
+    for (let lag = minLag + 1; lag < maxLag; lag++) {
+      const isPeak = corr[lag] >= 0.9 * maxCorr && corr[lag] > corr[lag - 1] && corr[lag] >= corr[lag + 1];
+      if (!isPeak) continue;
+      const a = corr[lag - 1];
+      const b = corr[lag];
+      const c = corr[lag + 1];
+      const shift = 0.5 * (a - c) / ((a - 2 * b + c) || 1);
+      return sampleRate / (lag + shift);
+    }
+    return null;
+  }
+
+  function paintMeter(level) {
+    $$('#meter span').forEach((bar, i) => {
+      bar.style.transform = `scaleY(${clamp(level * 10 * METER_SHAPE[i], 0.08, 1)})`;
+    });
+  }
+
+  function buildMeter() {
+    const host = $('#meter');
+    for (let i = 0; i < METER_SHAPE.length; i++) host.append(document.createElement('span'));
+  }
+
+  let lastTunerStatus = '';
+
+  function paintTuner(freq) {
+    if (!freq) return;
+    const a4 = Number($('#a4').value);
+    const midi = 69 + 12 * Math.log2(freq / a4);
+    const nearest = Math.round(midi);
+    const cents = Math.round((midi - nearest) * 100);
+    const pitchClass = ((nearest % 12) + 12) % 12;
+    const octave = Math.floor(nearest / 12) - 1;
+    const swara = SWARAS[(pitchClass - state.saIndex + 12) % 12];
+    const inTune = Math.abs(cents) <= 5;
+    const status = inTune ? 'In tune' : cents < 0 ? 'Flat' : 'Sharp';
+    const note = $('#note');
+    note.textContent = `${NOTE_NAMES[pitchClass]}${octave}`;
+    note.classList.toggle('ok', inTune);
+    $('#needle').style.transform = `rotate(${clamp(cents, -50, 50) * 1.2}deg)`;
+    $('#tuner-sub').textContent = `${status}, ${cents > 0 ? '+' : ''}${cents} cents. Swara ${swara}, with Sa on ${NOTE_NAMES[state.saIndex]}.`;
+    if (status !== lastTunerStatus) {
+      lastTunerStatus = status;
+      $('#tuner-status').textContent = status;
+    }
+  }
+
+  function setTunerMessage(message) {
+    $('#tuner-sub').textContent = message;
+  }
+
+  function setMicUI(on) {
+    const btn = $('#btn-mic');
+    btn.textContent = on ? 'Mic on' : 'Mic off';
+    btn.setAttribute('aria-pressed', String(on));
+    $('#you-note').textContent = on ? 'Your level is shown on the meter' : 'Mic is off';
+  }
+
+  function setTunerUI(on) {
+    const btn = $('#btn-tuner');
+    btn.textContent = on ? 'Stop tuner' : 'Start tuner';
+    btn.setAttribute('aria-pressed', String(on));
+    if (on) {
+      $('#tuner-sub').textContent = 'Listening…';
+      return;
+    }
+    lastTunerStatus = '';
+    $('#note').textContent = '–';
+    $('#note').classList.remove('ok');
+    $('#needle').style.transform = 'rotate(0deg)';
+    $('#tuner-sub').textContent = 'Turn on the tuner, then play or sing a note.';
+  }
+
+  $('#btn-mic').addEventListener('click', toggleMic);
+  $('#btn-tuner').addEventListener('click', toggleTuner);
+  $('#a4').addEventListener('input', e => { $('#a4-out').textContent = `${e.target.value} Hz`; });
+
+  $('#btn-share').addEventListener('click', e => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+    e.currentTarget.setAttribute('aria-pressed', String(on));
+    e.currentTarget.textContent = on ? 'Sharing backing with teacher' : 'Share backing with teacher';
+  });
+
+  $('#btn-cam').addEventListener('click', e => {
+    const on = e.currentTarget.getAttribute('aria-pressed') !== 'true';
+    e.currentTarget.setAttribute('aria-pressed', String(on));
+    e.currentTarget.textContent = on ? 'Camera on' : 'Camera off';
+  });
+
+  $('#btn-leave').addEventListener('click', () => {
+    stopTaal();
+    stopDrone();
+    disableMic();
+    location.hash = '#teacher';
+    toast('You left the class.');
+  });
+
+  // Chat is plain text, capped at 2,000 characters. Messages are written with textContent, never HTML.
+  $('#chat-form').addEventListener('submit', e => {
+    e.preventDefault();
+    const input = $('#chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+    const item = document.createElement('li');
+    item.className = 'msg';
+    const who = document.createElement('strong');
+    who.textContent = 'You';
+    item.append(who, document.createTextNode(text));
+    const list = $('#messages');
+    list.append(item);
+    list.scrollTop = list.scrollHeight;
+    input.value = '';
+  });
+
+  document.addEventListener('keydown', e => {
+    if (location.hash !== '#room') return;
+    if (e.target.closest?.('input, select, textarea, button')) return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      toggleTaal();
+      return;
+    }
+    const step = { ArrowRight: 1, ArrowLeft: -1, ArrowUp: 5, ArrowDown: -5 }[e.key];
+    if (step) {
+      e.preventDefault();
+      setBpm(state.bpm + step);
+    }
+  });
+
+  /* ---------- Hero waveform ---------- */
+
+  // Animates only while on screen, and draws once when the user prefers reduced motion.
+  function initWave() {
+    const canvas = $('#wave');
+    const g = canvas.getContext('2d');
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let w = 0;
+    let h = 0;
+    let raf = 0;
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      w = rect.width;
+      h = rect.height;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      g.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    const draw = t => {
+      g.clearRect(0, 0, w, h);
+      for (let k = 0; k < 4; k++) {
+        g.beginPath();
+        for (let x = 0; x <= w; x += 6) {
+          const envelope = 0.6 + 0.4 * Math.sin(x * 0.002 + t * 0.0004 + k);
+          const y = h * 0.55 + Math.sin(x * 0.012 + t * 0.0015 * (1 + k * 0.3) + k) * h * 0.16 * (1 - k * 0.18) * envelope;
+          if (x === 0) g.moveTo(x, y);
+          else g.lineTo(x, y);
+        }
+        g.strokeStyle = `hsla(${24 + k * 12}, 88%, 56%, ${0.42 - k * 0.09})`;
+        g.lineWidth = 2;
+        g.stroke();
+      }
+    };
+    if (reduceMotion) {
+      resize();
+      draw(0);
+      window.addEventListener('resize', () => { resize(); draw(0); });
+      return;
+    }
+    let visible = false;
+    const frame = t => {
+      draw(t);
+      raf = requestAnimationFrame(frame);
+    };
+    new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+      cancelAnimationFrame(raf);
+      if (visible) {
+        resize();
+        raf = requestAnimationFrame(frame);
+      }
+    }).observe(canvas);
+    window.addEventListener('resize', () => { if (visible) resize(); });
+  }
+
+  /* ---------- Shared ---------- */
+
+  let toastTimer = 0;
+  function toast(message) {
+    const el = $('#toast');
+    el.textContent = message;
+    el.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => el.classList.remove('show'), 3200);
+  }
+
+  function route() {
+    const name = location.hash.slice(1);
+    const view = VIEWS.includes(name) ? name : 'discover';
+    VIEWS.forEach(v => $('#' + v).classList.toggle('is-active', v === view));
+    $$('[data-nav]').forEach(link => {
+      if (link.dataset.nav === view) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+    if (view === 'teacher' && profileId !== state.teacherId) renderProfile();
+    window.scrollTo(0, 0);
+  }
+
+  function init() {
+    renderChips();
+    renderGrid();
+    buildTaalOptions();
+    renderMatras();
+    setBpm(state.bpm);
+    buildMeter();
+    setMicUI(false);
+    setTunerUI(false);
+    initWave();
+    window.addEventListener('hashchange', route);
+    route();
+  }
+
+  init();
+})();
+</script>

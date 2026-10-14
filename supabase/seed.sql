@@ -1,0 +1,8 @@
+-- =============================================================================
+-- DEVELOPMENT ONLY. Do not run this file against production.
+--
+-- The instrument and style catalogue is applied by migration 20261014120300, in every
+-- environment. This file adds development data only, and it currently adds none. Add
+-- people, teachers, prices or bookings here only, never in migrations, and keep them
+-- clearly fictional.
+-- =============================================================================

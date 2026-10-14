@@ -17,13 +17,13 @@ MUSME is a marketplace and live practice studio for music learners and teachers.
 
 ## 2. What the deck tells us
 
-| Deck claim | Reading for the product |
-|---|---|
-| Learners pay $40–90/hr for lessons globally | Price anchor for the learner side. Rates are set per teacher; no platform price rule is implied yet. |
-| Teachers in Pakistan and India earn very little | Supply-side promise: fair rates and verified teachers. |
-| Online music education: $3.43B (2025) growing to $6.63B (2030), ~14.1% CAGR | Market size as stated in the deck. Verify before investor use. |
+| Deck claim                                                                                                            | Reading for the product                                                                                                                     |
+| --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| Learners pay $40–90/hr for lessons globally                                                                           | Price anchor for the learner side. Rates are set per teacher; no platform price rule is implied yet.                                        |
+| Teachers in Pakistan and India earn very little                                                                       | Supply-side promise: fair rates and verified teachers.                                                                                      |
+| Online music education: $3.43B (2025) growing to $6.63B (2030), ~14.1% CAGR                                           | Market size as stated in the deck. Verify before investor use.                                                                              |
 | Yousician: recorded, interactive lessons. LessonFace/Take Lessons: 1:1 online video. Reverb/Gear4music: marketplaces. | **The gap:** live 1:1 teaching, practice tools, and South Asian and global instruments in one place. This is the differentiator to protect. |
-| Revenue: subscriptions, e-commerce commission, digital goods, P2P resale | Phase 1 needs only booking commission and course sales. Subscriptions and resale come later. |
+| Revenue: subscriptions, e-commerce commission, digital goods, P2P resale                                              | Phase 1 needs only booking commission and course sales. Subscriptions and resale come later.                                                |
 
 **Deck issues to fix before investor use**
 
@@ -37,12 +37,12 @@ MUSME is a marketplace and live practice studio for music learners and teachers.
 
 ## 3. Users and roles
 
-| Role | Core jobs |
-|---|---|
-| **Learner** | Find a teacher, book a live class or trial, chat, join class, practise, leave a review. |
-| **Teacher** | Get approved, manage profile, availability, courses and lessons, see earnings and lesson notes. |
+| Role            | Core jobs                                                                                                              |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| **Learner**     | Find a teacher, book a live class or trial, chat, join class, practise, leave a review.                                |
+| **Teacher**     | Get approved, manage profile, availability, courses and lessons, see earnings and lesson notes.                        |
 | **Admin** (you) | Approve teachers, manage bookings, refunds and disputes, run payouts, moderate content, view analytics and audit logs. |
-| **Guest** | Browse teachers, profiles and public course previews. Cannot book. |
+| **Guest**       | Browse teachers, profiles and public course previews. Cannot book.                                                     |
 
 Roles are stored in the database (`profiles.role`) and checked on the server. The admin role is never taken from client input.
 
@@ -53,6 +53,7 @@ Roles are stored in the database (`profiles.role`) and checked on the server. Th
 ### Phase 1: MVP ("book, learn, practise")
 
 **Learner**
+
 - Sign up and log in (email magic link, Google OAuth).
 - Discover teachers: search, filter by instrument and style, language, price, rating, and timezone.
 - Teacher profile: bio, credentials, intro video, courses, reviews, and availability.
@@ -66,6 +67,7 @@ Roles are stored in the database (`profiles.role`) and checked on the server. Th
 - Report and block a user.
 
 **Teacher**
+
 - Application and admin approval. Upload identity documents, instrument credentials, and a short sample performance.
 - Profile editor: photo, bio, instruments, styles, languages, rates, intro video.
 - Availability: weekly rules, exceptions, and buffer time between classes.
@@ -75,6 +77,7 @@ Roles are stored in the database (`profiles.role`) and checked on the server. Th
 - Earnings and payout status (read-only in MVP).
 
 **Admin**
+
 - Approve, reject, or suspend teachers. Every decision is written to the audit log.
 - Booking operations: search, cancel, refund, reschedule, resolve disputes.
 - Payments and payouts overview.
@@ -84,6 +87,7 @@ Roles are stored in the database (`profiles.role`) and checked on the server. Th
 - Analytics: bookings, gross volume, active teachers, conversion, no-show rate.
 
 **Platform**
+
 - Responsive web app (mobile first) and an installable PWA. No native app in Phase 1.
 - Transactional email (Resend). Cron-driven reminders.
 - Accessibility: keyboard operable, visible focus, WCAG 2.1 AA contrast.
@@ -132,15 +136,15 @@ Apply → upload documents and sample → admin review → approved (profile goe
 
 The Practice Room is the live-class toolkit. It is the main differentiator against the competitors in the deck.
 
-| Component | MVP spec |
-|---|---|
-| **Taal player** | Taals with matra count, vibhag grouping, tali and khali markers, and bol patterns. Launch set: Teentaal (16), Keherwa (8), Dadra (6), Jhaptaal (10). Ektaal, Rupak and others later. |
-| **Tempo** | 40–240 BPM, adjustable with slider or keys (left/right ±1, up/down ±5). Slow / medium / fast labels as a guide. |
-| **Speed trainer** | Raises tempo by a set step every N cycles until a target tempo. |
-| **Tanpura drone** | Tonic (Sa) selectable across 12 keys. Four-string pattern (Pa, Sa, Sa upper, Sa lower). Volume control. |
-| **Tuner** | Pitch detection from the microphone, cents deviation, A4 reference adjustable from 415 to 466 Hz, and swara names relative to the chosen Sa. |
-| **Backing to teacher** | Toggle to send the taal and drone mix to the teacher inside the video call. |
-| **Practice log** | Minutes, taal, and tempo saved per session. |
+| Component              | MVP spec                                                                                                                                                                             |
+| ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **Taal player**        | Taals with matra count, vibhag grouping, tali and khali markers, and bol patterns. Launch set: Teentaal (16), Keherwa (8), Dadra (6), Jhaptaal (10). Ektaal, Rupak and others later. |
+| **Tempo**              | 40–240 BPM, adjustable with slider or keys (left/right ±1, up/down ±5). Slow / medium / fast labels as a guide.                                                                      |
+| **Speed trainer**      | Raises tempo by a set step every N cycles until a target tempo.                                                                                                                      |
+| **Tanpura drone**      | Tonic (Sa) selectable across 12 keys. Four-string pattern (Pa, Sa, Sa upper, Sa lower). Volume control.                                                                              |
+| **Tuner**              | Pitch detection from the microphone, cents deviation, A4 reference adjustable from 415 to 466 Hz, and swara names relative to the chosen Sa.                                         |
+| **Backing to teacher** | Toggle to send the taal and drone mix to the teacher inside the video call.                                                                                                          |
+| **Practice log**       | Minutes, taal, and tempo saved per session.                                                                                                                                          |
 
 ### Engine rules
 
@@ -206,20 +210,20 @@ The UI never queries the database directly. Route handlers stay thin: validate, 
 
 ### Stack
 
-| Area | Choice | Notes |
-|---|---|---|
-| Framework | Next.js 16 (App Router), React 19, TypeScript strict | Standard from CLAUDE.md |
-| Styling | Tailwind CSS, shadcn/ui, Lucide icons | Standard from CLAUDE.md |
-| Animation | Motion (motion.dev) for React, CSS for hover and simple transitions, canvas for audio visuals | New dependency: approve |
-| Forms | React Hook Form + Zod (same schemas on client and server) | Standard |
-| Data | Supabase Postgres, Auth, Storage, Realtime | Standard |
-| Video | LiveKit or Agora (Phase 0 spike) | New service: approve |
-| Payments | Payment provider to be confirmed (section 14) | Open decision |
-| Course video | Mux or Cloudflare Stream | Phase 2; new service |
-| Email | Resend | Standard |
-| Rate limiting | Upstash Redis | New service: approve |
-| Hosting | Vercel (cron, analytics, speed insights) | Standard |
-| Package manager | npm | Standard |
+| Area            | Choice                                                                                        | Notes                   |
+| --------------- | --------------------------------------------------------------------------------------------- | ----------------------- |
+| Framework       | Next.js 16 (App Router), React 19, TypeScript strict                                          | Standard from CLAUDE.md |
+| Styling         | Tailwind CSS, shadcn/ui, Lucide icons                                                         | Standard from CLAUDE.md |
+| Animation       | Motion (motion.dev) for React, CSS for hover and simple transitions, canvas for audio visuals | New dependency: approve |
+| Forms           | React Hook Form + Zod (same schemas on client and server)                                     | Standard                |
+| Data            | Supabase Postgres, Auth, Storage, Realtime                                                    | Standard                |
+| Video           | LiveKit or Agora (Phase 0 spike)                                                              | New service: approve    |
+| Payments        | Payment provider to be confirmed (section 14)                                                 | Open decision           |
+| Course video    | Mux or Cloudflare Stream                                                                      | Phase 2; new service    |
+| Email           | Resend                                                                                        | Standard                |
+| Rate limiting   | Upstash Redis                                                                                 | New service: approve    |
+| Hosting         | Vercel (cron, analytics, speed insights)                                                      | Standard                |
+| Package manager | npm                                                                                           | Standard                |
 
 ### Folder structure (proposed)
 
@@ -261,11 +265,11 @@ src/
 
 ### Rendering strategy
 
-| Route | Strategy |
-|---|---|
-| Home, teacher listing | Static or ISR (revalidate every 60 s), tag-based revalidation on updates |
-| Teacher profile and courses | ISR with on-demand revalidation when the teacher edits |
-| Dashboards, bookings, admin | Dynamic, streamed with Suspense and `loading.tsx` |
+| Route                        | Strategy                                                                             |
+| ---------------------------- | ------------------------------------------------------------------------------------ |
+| Home, teacher listing        | Static or ISR (revalidate every 60 s), tag-based revalidation on updates             |
+| Teacher profile and courses  | ISR with on-demand revalidation when the teacher edits                               |
+| Dashboards, bookings, admin  | Dynamic, streamed with Suspense and `loading.tsx`                                    |
 | Live class and Practice Room | Client-rendered behind auth. Audio engine and video SDK loaded by dynamic `import()` |
 
 ---
@@ -274,27 +278,27 @@ src/
 
 All tables use `snake_case`, UUID primary keys, `created_at` and `updated_at` as `timestamptz` in UTC, and soft deletes (`deleted_at`) where business data must be recoverable. Money is stored as integer minor units (cents or paise) with an ISO currency code. Never floats.
 
-| Table | Purpose and key constraints |
-|---|---|
-| `profiles` | One row per auth user. `role` enum: `learner`, `teacher`, `admin`. Display name, avatar path, country, timezone, language. |
-| `teacher_profiles` | 1:1 with a profile. Headline, bio, `verification_status` enum, intro video path, languages. |
-| `instruments`, `music_styles` | Lookup tables. Avoid repeated strings. |
-| `teacher_instruments`, `teacher_styles` | Join tables. Composite primary keys. |
-| `availability_rules` | Weekly windows in the teacher's timezone, with valid-from and valid-to dates. |
-| `availability_exceptions` | Blocked or extra time ranges (`tstzrange`). |
-| `lesson_offerings` | Per teacher: title, duration, price, currency, `is_trial`. |
-| `bookings` | `time_range tstzrange`, `status` enum (`pending_payment`, `confirmed`, `in_progress`, `completed`, `cancelled`, `no_show`, `refunded`), prices snapshotted at booking time, idempotency key (unique). |
-| `payments` | Provider reference (unique), amount, status, link to booking. |
-| `webhook_events` | Provider event ID as primary key. Makes webhook processing idempotent. |
-| `payouts` | Per teacher. Provider reference (unique), status. |
-| `conversations`, `messages` | Conversation type `booking` or `direct`. Messages: body (max 2,000 chars), optional attachment path, soft delete. |
-| `courses`, `course_lessons`, `course_purchases` | Course status enum (`draft`, `review`, `published`, `archived`). Unique `(course_id, position)` and `(learner_id, course_id)`. |
-| `reviews` | Unique per booking. Rating check 1–5. Only for `completed` bookings. |
-| `lesson_notes` | Teacher-authored, visible to the matching learner only. |
-| `practice_sessions` | Learner, start, duration, taal, tempo, optional booking ID. |
-| `reports` | Reporter, target type and ID, reason, status, resolver. |
-| `admin_audit_log` | Actor, action, target, metadata (`jsonb`), timestamp. Append only. |
-| `notifications` | User, type, payload, read timestamp. |
+| Table                                           | Purpose and key constraints                                                                                                                                                                           |
+| ----------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `profiles`                                      | One row per auth user. `role` enum: `learner`, `teacher`, `admin`. Display name, avatar path, country, timezone, language.                                                                            |
+| `teacher_profiles`                              | 1:1 with a profile. Headline, bio, `verification_status` enum, intro video path, languages.                                                                                                           |
+| `instruments`, `music_styles`                   | Lookup tables. Avoid repeated strings.                                                                                                                                                                |
+| `teacher_instruments`, `teacher_styles`         | Join tables. Composite primary keys.                                                                                                                                                                  |
+| `availability_rules`                            | Weekly windows in the teacher's timezone, with valid-from and valid-to dates.                                                                                                                         |
+| `availability_exceptions`                       | Blocked or extra time ranges (`tstzrange`).                                                                                                                                                           |
+| `lesson_offerings`                              | Per teacher: title, duration, price, currency, `is_trial`.                                                                                                                                            |
+| `bookings`                                      | `time_range tstzrange`, `status` enum (`pending_payment`, `confirmed`, `in_progress`, `completed`, `cancelled`, `no_show`, `refunded`), prices snapshotted at booking time, idempotency key (unique). |
+| `payments`                                      | Provider reference (unique), amount, status, link to booking.                                                                                                                                         |
+| `webhook_events`                                | Provider event ID as primary key. Makes webhook processing idempotent.                                                                                                                                |
+| `payouts`                                       | Per teacher. Provider reference (unique), status.                                                                                                                                                     |
+| `conversations`, `messages`                     | Conversation type `booking` or `direct`. Messages: body (max 2,000 chars), optional attachment path, soft delete.                                                                                     |
+| `courses`, `course_lessons`, `course_purchases` | Course status enum (`draft`, `review`, `published`, `archived`). Unique `(course_id, position)` and `(learner_id, course_id)`.                                                                        |
+| `reviews`                                       | Unique per booking. Rating check 1–5. Only for `completed` bookings.                                                                                                                                  |
+| `lesson_notes`                                  | Teacher-authored, visible to the matching learner only.                                                                                                                                               |
+| `practice_sessions`                             | Learner, start, duration, taal, tempo, optional booking ID.                                                                                                                                           |
+| `reports`                                       | Reporter, target type and ID, reason, status, resolver.                                                                                                                                               |
+| `admin_audit_log`                               | Actor, action, target, metadata (`jsonb`), timestamp. Append only.                                                                                                                                    |
+| `notifications`                                 | User, type, payload, read timestamp.                                                                                                                                                                  |
 
 **Booking double-booking guard.** This is enforced in the database, not only in code:
 
@@ -341,17 +345,17 @@ Pending bookings hold the slot. A cron job releases `pending_payment` rows that 
 
 ## 12. Performance
 
-| Metric | Target | How it is kept |
-|---|---|---|
-| LCP, public pages (mid-range Android, 4G) | under 2.5 s | Static or ISR rendering, `next/image`, `next/font`, no render-blocking scripts |
-| INP | under 200 ms | Small client islands, no heavy work on the main thread, audio in an AudioWorklet |
-| CLS | under 0.1 | Reserved image and video dimensions, fixed-size skeletons |
-| Public-page JS (gzipped, first load) | under 120 KB | Server Components by default, client code only where interactive |
-| Classroom JS on join | lazy chunk, measured in CI | Video SDK and audio engine loaded with dynamic `import()` |
-| Beat timing jitter | under 5 ms | Audio-clock scheduling, no timer-driven audio |
-| Tuner update cost | under 4 ms per frame | Throttled to 20–30 fps, transform-only updates |
-| Teacher search, p95 | under 300 ms | Indexed queries, cursor pagination, cached listings |
-| Chat delivery (same region) | under 500 ms | Realtime with per-conversation filters |
+| Metric                                    | Target                     | How it is kept                                                                   |
+| ----------------------------------------- | -------------------------- | -------------------------------------------------------------------------------- |
+| LCP, public pages (mid-range Android, 4G) | under 2.5 s                | Static or ISR rendering, `next/image`, `next/font`, no render-blocking scripts   |
+| INP                                       | under 200 ms               | Small client islands, no heavy work on the main thread, audio in an AudioWorklet |
+| CLS                                       | under 0.1                  | Reserved image and video dimensions, fixed-size skeletons                        |
+| Public-page JS (gzipped, first load)      | under 120 KB               | Server Components by default, client code only where interactive                 |
+| Classroom JS on join                      | lazy chunk, measured in CI | Video SDK and audio engine loaded with dynamic `import()`                        |
+| Beat timing jitter                        | under 5 ms                 | Audio-clock scheduling, no timer-driven audio                                    |
+| Tuner update cost                         | under 4 ms per frame       | Throttled to 20–30 fps, transform-only updates                                   |
+| Teacher search, p95                       | under 300 ms               | Indexed queries, cursor pagination, cached listings                              |
+| Chat delivery (same region)               | under 500 ms               | Realtime with per-conversation filters                                           |
 
 These are targets. Measure them with Vercel Speed Insights, Lighthouse CI, and an audio round-trip test harness before each release.
 
@@ -367,14 +371,14 @@ These are targets. Measure them with Vercel Speed Insights, Lighthouse CI, and a
 
 The deck illustrations use warm orange, espresso brown, cream, and gold accents. The prototype derives its palette from those.
 
-| Token | Light | Dark |
-|---|---|---|
-| Background | `#FFF8EE` | `#1A120D` |
-| Surface | `#FFFFFF` | `#241913` |
-| Ink (text) | `#2B1D14` | `#FBEFE0` |
-| Muted text | `#6B5444` | `#C7B098` |
-| Primary (CTAs) | `#C2410C` (contrast 5.2:1 with white) | `#F97316` |
-| Accent (decorative, focus) | `#E9A93B` | `#F5C06A` |
+| Token                      | Light                                 | Dark      |
+| -------------------------- | ------------------------------------- | --------- |
+| Background                 | `#FFF8EE`                             | `#1A120D` |
+| Surface                    | `#FFFFFF`                             | `#241913` |
+| Ink (text)                 | `#2B1D14`                             | `#FBEFE0` |
+| Muted text                 | `#6B5444`                             | `#C7B098` |
+| Primary (CTAs)             | `#C2410C` (contrast 5.2:1 with white) | `#F97316` |
+| Accent (decorative, focus) | `#E9A93B`                             | `#F5C06A` |
 
 Typography: Inter, as set in CLAUDE.md. A display face is a brand decision and is not included.
 
@@ -421,6 +425,7 @@ What the search found:
 ## 15. Roadmap and exit criteria
 
 ### Phase 0: Decisions and spikes (about 1–2 weeks)
+
 - Resolve section 17 decisions.
 - Video provider spike (LiveKit vs Agora) on real mobile networks.
 - Audio test: confirm the microphone constraints preserve tabla and tanpura quality, using real instruments.
@@ -432,6 +437,7 @@ What the search found:
 **Exit:** signed-off architecture; provider contracts confirmed; a working spike showing acceptable audio latency and quality.
 
 ### Phase 1: MVP
+
 - Auth, roles, profiles, teacher onboarding and admin approval.
 - Availability, booking with database-level double-booking protection, payment, and email reminders.
 - Text chat.
@@ -441,26 +447,28 @@ What the search found:
 **Exit:** 5 pilot teachers and 30 test bookings completed end to end. Zero double-bookings. Zero payment mismatches. Public pages meet the performance targets in section 12. Security checklist complete, with an automated baseline scan (for example OWASP ZAP) passing with no high-severity findings.
 
 ### Phase 2: Courses and growth
+
 Course builder, video hosting, purchases, subscriptions, group classes, recordings with consent, calendar sync, WhatsApp reminders, progress dashboard.
 
 ### Phase 3: Marketplace and immersion
+
 Instrument marketplace with escrow, digital goods store, events, community, mobile apps, and R&D spikes for AR and VR.
 
 ---
 
 ## 16. Risks
 
-| Risk | Impact | Mitigation |
-|---|---|---|
-| Internet latency breaks live playing | Poor duet experience | Teacher leads; local practice engine; latency indicator; guidance on connections and headphones |
-| WebRTC audio processing degrades music | Teacher cannot hear the instrument well | Processing off by default; tested with real instruments in Phase 0 |
-| Payouts not available in PK or IN | Teachers cannot be paid | Provider confirmation before build; fallback rails |
-| Sample licensing | Legal exposure | Record bols in-house or licence them; keep licences in `/docs` |
-| Bandwidth and media costs | Margin erosion | Per-minute cost model; audio-first low-data mode; caps and monitoring |
-| Teacher quality and trust | Churn, bad reviews | Verification, reviews only after completed lessons, admin review |
-| No-shows, chargebacks, disputes | Revenue loss, admin load | Cancellation policy, pending-hold expiry, dispute tooling |
-| Scope creep (AR/VR, NFTs, marketplace) | Delayed MVP | Phases with explicit exclusions |
-| Data-protection and tax obligations | Fines, rework | Counsel review in Phase 0; data minimisation from the start |
+| Risk                                   | Impact                                  | Mitigation                                                                                      |
+| -------------------------------------- | --------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Internet latency breaks live playing   | Poor duet experience                    | Teacher leads; local practice engine; latency indicator; guidance on connections and headphones |
+| WebRTC audio processing degrades music | Teacher cannot hear the instrument well | Processing off by default; tested with real instruments in Phase 0                              |
+| Payouts not available in PK or IN      | Teachers cannot be paid                 | Provider confirmation before build; fallback rails                                              |
+| Sample licensing                       | Legal exposure                          | Record bols in-house or licence them; keep licences in `/docs`                                  |
+| Bandwidth and media costs              | Margin erosion                          | Per-minute cost model; audio-first low-data mode; caps and monitoring                           |
+| Teacher quality and trust              | Churn, bad reviews                      | Verification, reviews only after completed lessons, admin review                                |
+| No-shows, chargebacks, disputes        | Revenue loss, admin load                | Cancellation policy, pending-hold expiry, dispute tooling                                       |
+| Scope creep (AR/VR, NFTs, marketplace) | Delayed MVP                             | Phases with explicit exclusions                                                                 |
+| Data-protection and tax obligations    | Fines, rework                           | Counsel review in Phase 0; data minimisation from the start                                     |
 
 ---
 
@@ -468,16 +476,16 @@ Instrument marketplace with escrow, digital goods store, events, community, mobi
 
 Each item includes a recommendation. Nothing is final until you confirm it.
 
-1. **Business model.** Platform fee on bookings (percentage), any subscription tiers, and trial pricing rules. *Recommend:* a single booking commission at launch; subscriptions in Phase 2 after usage data exists.
-2. **Payment and payout providers.** Confirm coverage for Pakistan and India (section 14). *Recommend:* run the spike before committing.
-3. **Brand name.** MUSME, MUV, or MUS Studio. *Recommend:* MUSME, to match the deck title.
-4. **Video provider.** Approve the LiveKit vs Agora spike. *Recommend:* LiveKit if its audio options hold up, for the open-source option and lower lock-in.
-5. **Stack and new services.** Approve Next.js 16, Supabase, and Vercel, plus LiveKit (or Agora), Upstash Redis, and Mux or Cloudflare Stream in Phase 2. *Recommend:* approve, since these match the standards in the parent CLAUDE.md.
-6. **Scope cuts.** Drop NFTs. Defer AR/VR and the Stage Simulator. *Recommend:* both.
-7. **Recording in MVP.** *Recommend:* no. Add in Phase 2 with consent flows.
+1. **Business model.** Platform fee on bookings (percentage), any subscription tiers, and trial pricing rules. _Recommend:_ a single booking commission at launch; subscriptions in Phase 2 after usage data exists.
+2. **Payment and payout providers.** Confirm coverage for Pakistan and India (section 14). _Recommend:_ run the spike before committing.
+3. **Brand name.** MUSME, MUV, or MUS Studio. _Recommend:_ MUSME, to match the deck title.
+4. **Video provider.** Approve the LiveKit vs Agora spike. _Recommend:_ LiveKit if its audio options hold up, for the open-source option and lower lock-in.
+5. **Stack and new services.** Approve Next.js 16, Supabase, and Vercel, plus LiveKit (or Agora), Upstash Redis, and Mux or Cloudflare Stream in Phase 2. _Recommend:_ approve, since these match the standards in the parent CLAUDE.md.
+6. **Scope cuts.** Drop NFTs. Defer AR/VR and the Stage Simulator. _Recommend:_ both.
+7. **Recording in MVP.** _Recommend:_ no. Add in Phase 2 with consent flows.
 8. **Launch markets, languages, currency.** Which countries first, which UI languages (English first; Urdu and Hindi later?), and whether to price in USD only or in local currency.
-9. **Taal library and bols.** Who records the bols, and who validates the taal definitions? *Recommend:* engage a tabla teacher as an early teacher partner and paid reviewer.
-10. **Mobile.** *Recommend:* responsive web with an installable PWA first. Native apps in Phase 3.
+9. **Taal library and bols.** Who records the bols, and who validates the taal definitions? _Recommend:_ engage a tabla teacher as an early teacher partner and paid reviewer.
+10. **Mobile.** _Recommend:_ responsive web with an installable PWA first. Native apps in Phase 3.
 11. **Legal review.** Teacher agreements (independent contractor terms), tax treatment, and data-protection obligations for each market.
 
 ---

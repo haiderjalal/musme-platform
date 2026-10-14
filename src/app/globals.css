@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens. Colors are defined once on :root and redefined for dark mode.
+ * Components use the Tailwind utilities mapped below, never literal colors.
+ */
+:root {
+  --bg: #fff8ee;
+  --surface: #ffffff;
+  --surface-2: #fbf1e2;
+  --ink: #2b1d14;
+  --muted: #6b5444;
+  --line: #eadcc8;
+  --primary: #c2410c;
+  --primary-ink: #ffffff;
+  --accent: #e9a93b;
+  --ok: #15803d;
+  --danger: #b91c1c;
+  --danger-ink: #ffffff;
+  --room-bg: #1b120d;
+  --room-surface: #2a1d16;
+  --room-ink: #fbefe0;
+  --room-muted: #c7b098;
+  --room-accent: #f59e4b;
+  --room-ok: #86efac;
+  --shadow: 0 14px 34px -16px rgb(43 29 20 / 0.35);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1a120d;
+    --surface: #241913;
+    --surface-2: #2e211a;
+    --ink: #fbefe0;
+    --muted: #c7b098;
+    --line: #3a2a20;
+    --primary: #f97316;
+    --primary-ink: #1a120d;
+    --accent: #f5c06a;
+    --ok: #4ade80;
+    --danger: #f87171;
+    --danger-ink: #1a120d;
+    --shadow: 0 14px 34px -16px rgb(0 0 0 / 0.6);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #1a120d;
+  --surface: #241913;
+  --surface-2: #2e211a;
+  --ink: #fbefe0;
+  --muted: #c7b098;
+  --line: #3a2a20;
+  --primary: #f97316;
+  --primary-ink: #1a120d;
+  --accent: #f5c06a;
+  --ok: #4ade80;
+  --danger: #f87171;
+  --danger-ink: #1a120d;
+  --shadow: 0 14px 34px -16px rgb(0 0 0 / 0.6);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-primary: var(--primary);
+  --color-primary-ink: var(--primary-ink);
+  --color-accent: var(--accent);
+  --color-ok: var(--ok);
+  --color-danger: var(--danger);
+  --color-danger-ink: var(--danger-ink);
+  --color-room-bg: var(--room-bg);
+  --color-room-surface: var(--room-surface);
+  --color-room-ink: var(--room-ink);
+  --color-room-muted: var(--room-muted);
+  --color-room-accent: var(--room-accent);
+  --color-room-ok: var(--room-ok);
+  --shadow-card: var(--shadow);
+  --radius-card: 18px;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+}
+
+/* Entrance and ambient motion. Transform and opacity only. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+@keyframes ping-dot {
+  0% {
+    box-shadow: 0 0 0 0 currentColor;
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+}
+
+@keyframes breathe {
+  50% {
+    transform: scale(1.035);
+  }
+}
+
+@layer utilities {
+  .motion-rise {
+    animation: rise 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+
+  .motion-card-in {
+    animation: card-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+
+  .motion-ping::before {
+    content: "";
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: currentColor;
+    animation: ping-dot 1.8s cubic-bezier(0.2, 0.8, 0.2, 1) infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

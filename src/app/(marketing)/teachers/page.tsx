@@ -29,6 +29,7 @@ export default async function TeachersPage({
     q: first(raw.q),
   });
   const filters = parsed.success ? parsed.data : {};
+  const hasActiveFilters = Boolean(filters.instrument || filters.q?.trim());
 
   const [instruments, teachers] = await Promise.all([
     listInstruments(),
@@ -51,11 +52,18 @@ export default async function TeachersPage({
       <TeacherFilters instruments={instruments} selected={filters.instrument} query={filters.q} />
 
       {teachers.length === 0 ? (
-        <EmptyState
-          title="No teachers match these filters yet."
-          description="Try a different instrument or clear the search. New teachers are added after review."
-          action={{ label: "Show all teachers", href: ROUTES.teachers }}
-        />
+        hasActiveFilters ? (
+          <EmptyState
+            title="No teachers match these filters yet."
+            description="Try a different instrument or clear the search."
+            action={{ label: "Show all teachers", href: ROUTES.teachers }}
+          />
+        ) : (
+          <EmptyState
+            title="No teachers are listed yet."
+            description="Teachers appear here once their applications have been reviewed and approved."
+          />
+        )
       ) : (
         <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" aria-label="Teachers">
           {teachers.map((teacher, index) => (

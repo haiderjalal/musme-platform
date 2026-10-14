@@ -42,7 +42,9 @@ export async function listPendingTeachers(): Promise<PendingTeacher[]> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("teacher_profiles")
-    .select("profile_id, slug, headline, created_at, profiles(display_name)")
+    .select(
+      "profile_id, slug, headline, created_at, profiles:profiles!teacher_profiles_profile_id_fkey(display_name)",
+    )
     .eq("verification_status", "submitted")
     .order("created_at", { ascending: true })
     .limit(100);

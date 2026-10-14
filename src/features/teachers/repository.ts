@@ -37,13 +37,15 @@ const teacherRow = z.object({
 type TeacherRow = z.infer<typeof teacherRow>;
 
 // Columns are named explicitly. SELECT * would send fields the page never renders.
+// The profile embed names its foreign key: teacher_profiles links to profiles twice (the teacher,
+// and the admin who reviewed them), and PostgREST rejects an unnamed embed as ambiguous (PGRST201).
 const TEACHER_SELECT = `
   profile_id,
   slug,
   headline,
   bio,
   languages,
-  profiles(display_name, timezone),
+  profiles:profiles!teacher_profiles_profile_id_fkey(display_name, timezone),
   teacher_instruments(instruments(id, slug, name)),
   lesson_offerings(id, title, duration_minutes, price_minor, currency, is_trial, is_active)
 `;
